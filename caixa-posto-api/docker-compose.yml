@@ -1,0 +1,37 @@
+version: '3'
+services:
+    db:
+        image: 'postgres:latest'
+        environment: 
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_DB: caixaposto
+        volumes:
+            - ./pgdata:/var/lib/postgresql/data
+        ports: 
+            - "5469:5432"
+    pgadmin:
+        image: 'dpage/pgadmin4'
+        environment:
+            PGADMIN_DEFAULT_EMAIL: posto@posto
+            PGADMIN_DEFAULT_PASSWORD: posto
+        ports:
+            - "8069:80"
+        depends_on: 
+            - db
+    api:
+        container_name: caixaposto-api
+        restart: always
+        build: .
+        ports: 
+            - "5000:5000"
+        depends_on: 
+            - pgadmin
+    app:
+        container_name: caixaposto-app
+        restart: always
+        build: ../caixa-posto-app/.
+        ports: 
+            - "80:80"
+        depends_on: 
+            - api
